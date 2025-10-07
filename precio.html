@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Precios</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #00075685;
+   
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 22px;
+      color: #222;
+    }
+    #filterInfo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #filterInfo span {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+      color: #fff;
+    }
+    /* Colores dinámicos */
+    .badge-all { background: #6c757d; }
+    .badge-moto { background: #28a745; }
+    .badge-auto { background: #007bff; }
+    .badge-panel { background: #17a2b8; }
+    .badge-camioneta { background: #ffc107; color: #000; }
+    .badge-microbus { background: #fd7e14; }
+    .badge-camion { background: #dc3545; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .filters button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+      transition: transform 0.2s;
+    }
+    .filters button:hover {
+      transform: scale(1.05);
+    }
+    /* Colores de botones */
+    .btn-all { background: #6c757d; }
+    .btn-moto { background: #28a745; }
+    .btn-auto { background: #007bff; }
+    .btn-panel { background: #17a2b8; }
+    .btn-camioneta { background: #ffc107; color: #000; }
+    .btn-microbus { background: #fd7e14; }
+    .btn-camion { background: #dc3545; }
+
+    .filters button.active {
+      outline: 3px solid rgba(0,0,0,0.2);
+    }
+
+    /* Tabla */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      min-width: 900px;
+    }
+    thead {
+      background: #222;
+      color: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background: #ffb100;
+      color: #000;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    tbody tr:hover {
+      background: #ffe7b8;
+      transition: 0.3s;
+    }
+
+    /* Tarjetas para móviles */
+    .cards-container {
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: scale(1.02); }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+    }
+    .card ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .card ul li {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding: 6px 0;
+      font-size: 14px;
+    }
+
+    
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      padding: 10px 20px;
+      color: white;
+    }
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .navbar .logo img {
+      height: 35px;
+      margin-right: 10px;
+    }
+    .navbar ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar ul li {
+      margin: 0 10px;
+    }
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    .navbar ul li a:hover {
+      color: #ffb100;
+    }
+
+    /* BOTÓN MENÚ HAMBURGUESA */
+    .menu-toggle {
+      display: none;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .table-container { display: none; }
+      .cards-container { display: flex; }
+      h2 { font-size: 18px; }
+      .filters button { font-size: 12px; padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+    
+   <!-- NAVBAR -->
+   <nav class="navbar">
+    <div class="logo">
+      <img src="/assets/imgs/logo.png" alt="Logo">
+      Asercar
+    </div>
+    <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i>
+    <ul id="nav-links">
+      <li><a href="/index.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/cafeteria/cafeteria.html"><i class="fas fa-coffee"></i> Cafetería</a></li>
+      <li><a href="/tienda/index.html"><i class="fas fa-store"></i> Tienda</a></li>
+    </ul>
+  </nav>
+
+
+
+  <h2>Listado de Precios - Asercar</h2>
+  <div id="filterInfo"><span class="badge-all">Filtrando: Todos</span></div>
+
+  <!-- Botones de filtro -->
+  <div class="filters">
+    <button class="btn-all active" onclick="filterCategory('all','Todos','badge-all', event)"><i class="fas fa-list"></i> Todos</button>
+    <button class="btn-moto" onclick="filterCategory('moto','Motos','badge-moto', event)"><i class="fas fa-motorcycle"></i> Motos</button>
+    <button class="btn-auto" onclick="filterCategory('auto','Autos','badge-auto', event)"><i class="fas fa-car"></i> Autos</button>
+    <button class="btn-panel" onclick="filterCategory('panel','Paneles','badge-panel', event)"><i class="fas fa-truck-pickup"></i> Paneles</button>
+    <button class="btn-camioneta" onclick="filterCategory('camioneta','Camionetas','badge-camioneta', event)"><i class="fas fa-truck"></i> Camionetas</button>
+    <button class="btn-microbus" onclick="filterCategory('microbus','Microbuses','badge-microbus', event)"><i class="fas fa-van-shuttle"></i> Microbuses</button>
+    <button class="btn-camion" onclick="filterCategory('camion','Camiones','badge-camion', event)"><i class="fas fa-truck-moving"></i> Camiones</button>
+  </div>
+
+  <!-- Versión tabla (PC/Tablet) -->
+  <div class="table-container">
+    <table id="priceTable">
+      <thead>
+        <tr>
+          <th>Servicios</th>
+          <th data-cat="moto">Motos (c/sidecar)</th>
+          <th data-cat="moto">Motos (sin sidecar)</th>
+          <th data-cat="auto">Autos</th>
+          <th data-cat="panel">Panel (pequeño)</th>
+          <th data-cat="panel">Panel (grande)</th>
+          <th data-cat="camioneta">Camioneta</th>
+          <th data-cat="microbus">Microbus (-10 plazas)</th>
+          <th data-cat="microbus">Microbus (+10 plazas)</th>
+          <th data-cat="camion">Camión</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Fregado estándar</td><td>700</td><td>500 / 650</td><td>800</td><td>850</td><td>950</td><td>1200 / 1300</td><td>2000</td><td>3000</td><td>3100</td></tr>
+        <tr><td>Fregado estándar nocturno</td><td>800</td><td>600 / 750</td><td>900</td><td>950</td><td>1050</td><td>1300 / 1400</td><td>2100</td><td>2900</td><td>3200</td></tr>
+        <tr><td>Fregado motor</td><td>300</td><td>300</td><td>600</td><td>600</td><td>650</td><td>600</td><td>600</td><td>600</td><td>800</td></tr>
+        <tr><td>Fregado inferior</td><td></td><td></td><td>500 / 1500</td><td>600</td><td>650</td><td>750</td><td>900</td><td>1200</td><td>1500</td></tr>
+        <tr><td>Desengrase</td><td>850</td><td>800</td><td>1700</td><td>1400</td><td>1400</td><td>1500</td><td>1500</td><td>1500</td><td>1500</td></tr>
+        <tr><td>Encerado</td><td>1000</td><td>800</td><td>1800</td><td>1900</td><td>2000</td><td>2200</td><td>2200</td><td>2200</td><td></td></tr>
+        <tr><td>Limpieza Integral de Salòn</td><td></td><td></td><td>10000</td><td>10000</td><td>11000</td><td>10000</td><td>13000</td><td>15000</td><td>10000</td></tr>
+        <tr><td>Techo</td><td></td><td></td><td>2000</td><td>2500</td><td>2500</td><td>2500</td><td>3000</td><td>3000</td><td>2500</td></tr>
+        <tr><td>Alfombra fija de Piso</td><td></td><td></td><td>2200</td><td>2500</td><td>2500</td><td>2500</td><td>2800</td><td>2800</td><td></td></tr>
+        <tr><td>Asientos c/u</td><td></td><td></td><td>700</td><td>700</td><td>700</td><td>700</td><td>700</td><td>700</td><td>700</td></tr>
+        <tr><td>Paños de Puerta c/u</td><td></td><td></td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td></tr>
+        <tr><td>Cinturòn de Seguridad c/u</td><td></td><td></td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td><td>500</td></tr>
+        <tr><td>Plàsticos Interiores</td><td></td><td></td><td>1000</td><td>1500</td><td>1500</td><td>1500</td><td>1800</td><td>1800</td><td>2000</td></tr>
+        <tr><td>Maletero</td><td>500(cama)</td><td></td><td>700</td><td>700</td><td>700</td><td>800</td><td>800</td><td>800</td><td>2000(cama)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Versión tarjetas (Móviles) -->
+  <div class="cards-container" id="cardsContainer"></div>
+
+  <script>
+    const data = [
+      { servicio: "Fregado estándar", moto: "700 / 500-650", auto: "800", panel: "850/950", camioneta: "1200/1300", microbus: "2000/3000", camion: "3100" },
+      { servicio: "Fregado estándar nocturno", moto: "800 / 600/750", auto: "900", panel: "950/1050", camioneta: "1300/1400", microbus: "2100/2900", camion: "3200" },
+      { servicio: "Fregado motor", moto: "300", auto: "600", panel: "600/650", camioneta: "600", microbus: "600", camion: "800" },
+      { servicio: "Fregado inferior", auto: "500/1500", panel: "600/650", camioneta: "750", microbus: "900/1200", camion: "1500" },
+      { servicio: "Desengrase", moto: "850/800", auto: "1700", panel: "1400", camioneta: "1500", microbus: "1500", camion: "1500" },
+      { servicio: "Encerado", moto: "1000/800", auto: "1800", panel: "1900/2000", camioneta: "2200", microbus: "2200" },
+      { servicio: "Limpieza Integral de Salòn", auto: "10000", panel: "1000/1100", camioneta: "10000", microbus: "13000/15000", camion: "10000" },
+      { servicio: "Techo", auto: "2000", panel: "2500", camioneta: "2500", microbus: "3000", camion: "2500" },
+      { servicio: "Alfombra fija de Piso", auto: "2200", panel: "2500", camioneta: "2500", microbus: "2800"},
+      { servicio: "Asientos c/u", auto: "700", panel: "700", camioneta: "700", microbus: "700", camion: "700" },
+    { servicio: "Paños de Puerta c/u", auto: "500", panel: "500", camioneta: "500", microbus: "500", camion: "500" },
+    { servicio: "Cinturòn de Seguridad c/u", auto: "500", panel: "500", camioneta: "500", microbus: "500", camion: "500" },
+    { servicio: "Plàsticos Interiores", auto: "1000", panel: "1500", camioneta: "1500", microbus: "1800", camion: "2000" },
+    { servicio: "Maletero", auto: "700", panel: "700", camioneta: "800", microbus: "800", camion: "2000" },
+
+    ];
+
+    function filterCategory(category, label, badgeClass, event) {
+      const table = document.getElementById("priceTable");
+      const headers = table.querySelectorAll("thead th");
+      const buttons = document.querySelectorAll(".filters button");
+      const filterInfo = document.getElementById("filterInfo").querySelector("span");
+      const cardsContainer = document.getElementById("cardsContainer");
+
+      // Reset botones activos
+      buttons.forEach(btn => btn.classList.remove("active"));
+      event.currentTarget.classList.add("active");
+
+      // Actualizar badge
+      filterInfo.className = badgeClass;
+      filterInfo.textContent = "Filtrando: " + label;
+
+      // Mostrar/ocultar columnas en tabla
+      headers.forEach((th, index) => {
+        if (index === 0) return;
+        const cat = th.getAttribute("data-cat");
+        const show = category === "all" || (cat && cat.includes(category));
+        th.style.display = show ? "" : "none";
+        table.querySelectorAll("tbody tr").forEach(row => {
+          if (row.cells[index]) {
+            row.cells[index].style.display = show ? "" : "none";
+          }
+        });
+      });
+
+      // Generar tarjetas para móviles
+      cardsContainer.innerHTML = "";
+      data.forEach(item => {
+        if (category === "all") {
+          createCard(item, cardsContainer);
+        } else if (item[category]) {
+          createCard({ servicio: item.servicio, [category]: item[category] }, cardsContainer);
+        }
+      });
+    }
+
+    function createCard(item, container) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const title = document.createElement("h3");
+      title.textContent = item.servicio;
+      card.appendChild(title);
+
+      const ul = document.createElement("ul");
+      Object.entries(item).forEach(([key, value]) => {
+        if (key !== "servicio") {
+          const li = document.createElement("li");
+          li.innerHTML = `<span><b>${key.toUpperCase()}:</b></span> <span>${value}</span>`;
+          ul.appendChild(li);
+        }
+      });
+
+      card.appendChild(ul);
+      container.appendChild(card);
+    }
+
+    // Inicializar con "Todos"
+    filterCategory('all','Todos','badge-all',{currentTarget:document.querySelector(".btn-all")});
+  </script>
+</body>
+</html>
