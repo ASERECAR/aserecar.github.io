@@ -5944,3 +5944,27 @@ a.badge-dark:focus, a.badge-dark.focus {
 }
 
 
+.boton-flotante {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  background-color: #ff5733; /* Color inicial */
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 15px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  animation: parpadeo 1.5s infinite; /* Animación infinita */
+}
+
+/* Animación de parpadeo */
+@keyframes parpadeo {
+  0%, 100% {
+    background-color: #00ff00; /* Color 1 */
+  }
+  50% {
+    background-color: #ff6600; /* Color 2 */
+  }
+}
